@@ -82,4 +82,25 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { userRegister, loginUser };
+const getAllUsers = async(req,res)=>{
+  try {
+    const allData = await User.find({})
+if(allData.length > 0){
+  res.status(200).json({
+    status:"success",
+    data : allData
+  })
+}else{
+  res.status(404).json({
+    message :"No Data Found!"
+    })
+}
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    })
+   }
+
+}
+
+module.exports = { userRegister, loginUser,getAllUsers };
