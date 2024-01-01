@@ -1,11 +1,19 @@
 const secure = require("../bcrypt/bcrypt");
 const User = require("../model/userModel");
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 
 const userRegister = async (req, res) => {
   try {
-    const { userName, password, gender, references, city, state, phoneNumber,email } =
-      req.body;
+    const {
+      userName,
+      password,
+      gender,
+      references,
+      city,
+      state,
+      phoneNumber,
+      email,
+    } = req.body;
     if (
       !userName ||
       !password ||
@@ -13,7 +21,7 @@ const userRegister = async (req, res) => {
       !references ||
       !city ||
       !state ||
-      !phoneNumber||
+      !phoneNumber ||
       !email
     ) {
       return res.status(203).json({
@@ -82,25 +90,68 @@ const loginUser = async (req, res) => {
   }
 };
 
-const getAllUsers = async(req,res)=>{
+const getAllUsers = async (req, res) => {
   try {
-    const allData = await User.find({})
-if(allData.length > 0){
-  res.status(200).json({
-    status:"success",
-    data : allData
-  })
-}else{
-  res.status(404).json({
-    message :"No Data Found!"
-    })
-}
+    const allData = await User.find({});
+    if (allData.length > 0) {
+      res.status(200).json({
+        status: "success",
+        data: allData,
+      });
+    } else {
+      res.status(404).json({
+        message: "No Data Found!",
+      });
+    }
   } catch (error) {
     res.status(400).json({
       message: error.message,
-    })
-   }
+    });
+  }
+};
 
-}
+const editUser = async (req, res) => {
+  const userId = req.params.id;
 
-module.exports = { userRegister, loginUser,getAllUsers };
+  try {
+    const updatedUser = await User.findByIdAndUpdate(userId, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      data: updatedUser,
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  const userId = req.params.id;
+  try {
+    const deletedUser = await User.findByIdAndDelete(userId);
+    if (!deletedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: error.message,
+    });
+  }
+};
+
+module.exports = { userRegister, loginUser, getAllUsers, editUser, deleteUser };
